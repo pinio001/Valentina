@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Saint-Valentin 💘</title>
+  <style>
+    :root { --bg1:#ff4d6d; --bg2:#ff9a9e; }
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, #fff 0%, #ffe3e8 30%, #ffd1dc 55%, #ffc2d1 100%);
+      padding: 24px;
+    }
+    .card{
+      width:min(720px, 100%);
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(255,255,255,.6);
+      border-radius: 24px;
+      padding: 28px 22px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.12);
+      text-align:center;
+      position: relative;
+      overflow:hidden;
+    }
+    h1{
+      margin: 0 0 8px;
+      font-size: clamp(22px, 3.2vw, 34px);
+      line-height: 1.15;
+    }
+    p{
+      margin: 0 0 18px;
+      color:#444;
+      font-size: 16px;
+    }
+    .buttons{
+      position: relative;
+      height: 140px; /* espace pour que le bouton Non bouge */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 18px;
+      margin-top: 10px;
+    }
+    button{
+      border: 0;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,.12);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #yes{
+      background: #16a34a;
+      color: white;
+    }
+    #yes:hover{ transform: translateY(-1px); box-shadow: 0 12px 30px rgba(0,0,0,.16); }
+    #no{
+      background: #ef4444;
+      color: white;
+      position: absolute; /* pour pouvoir le déplacer librement */
+      left: 60%;
+      top: 55%;
+      transform: translate(-50%, -50%);
+      touch-action: none;
+    }
+    .result{
+      margin-top: 18px;
+      font-size: 18px;
+      font-weight: 600;
+      color:#111;
+      min-height: 24px;
+    }
+    .heart{
+      font-size: 30px;
+      display:inline-block;
+      animation: pop 1.2s ease-in-out infinite;
+    }
+    @keyframes pop{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.15); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Voudriez-vous Clémence être ma Valentine ? <span class="heart">💘</span></h1>
+    <p>Choisissez avec sagesse 😄</p>
+
+    <div class="buttons" id="arena">
+      <button id="yes">Oui</button>
+      <button id="no" aria-label="Non">Non</button>
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const arena = document.getElementById('arena');
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+    const result = document.getElementById('result');
+
+    // Déplace le bouton "Non" dans la zone (arena) en évitant les bords
+    function moveNoButton() {
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      const padding = 8;
+      const maxX = a.width - b.width - padding * 2;
+      const maxY = a.height - b.height - padding * 2;
+
+      const x = padding + Math.random() * Math.max(0, maxX);
+      const y = padding + Math.random() * Math.max(0, maxY);
+
+      noBtn.style.left = x + 'px';
+      noBtn.style.top  = y + 'px';
+      noBtn.style.transform = 'translate(0,0)';
+    }
+
+    // Bouge "incessamment"
+    let timer = null;
+    function startDodging() {
+      if (timer) return;
+      timer = setInterval(moveNoButton, 420); // vitesse: plus petit = plus “agité”
+    }
+    startDodging();
+
+    // Bonus: il fuit aussi quand on approche le curseur
+    arena.addEventListener('mousemove', (e) => {
+      const b = noBtn.getBoundingClientRect();
+      const dx = e.clientX - (b.left + b.width / 2);
+      const dy = e.clientY - (b.top + b.height / 2);
+      const dist = Math.hypot(dx, dy);
+
+      if (dist < 120) moveNoButton();
+    });
+
+    // Mobile: dès qu’on tente de toucher, il bouge
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    yesBtn.addEventListener('click', () => {
+      result.textContent = "Yesss 😍 Rendez-vous pour une belle Saint-Valentin !";
+      // Optionnel: on “désactive” la fuite après le oui
+      clearInterval(timer); timer = null;
+      noBtn.style.opacity = 0.35;
+      noBtn.style.pointerEvents = 'none';
+    });
+
+    // Position initiale propre
+    moveNoButton();
+  </script>
+</body>
+</html>
